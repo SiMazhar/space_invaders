@@ -1,5 +1,4 @@
 import pygame
-import random
 
 class AlienLaser(pygame.sprite.Sprite):
     def __init__(self, pos):
