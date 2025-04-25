@@ -22,8 +22,13 @@ class Game:
     def run(self):
         self.player.update()
         self.aliens.update()  # update aliens using their move function
+        # Check collision: remove player laser and alien on hit
+        pygame.sprite.groupcollide(self.player.sprite.lasers, self.aliens, True, True)
         self.aliens.draw(screen)
-        self.player.sprite.lasers.draw(screen)  # Draw the laser
+        # Draw lasers from all aliens
+        for alien in self.aliens:
+            alien.lasers.draw(screen)
+        self.player.sprite.lasers.draw(screen)  # Draw the player laser
         self.player.draw(screen)
 
 if __name__ == "__main__":
