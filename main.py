@@ -34,6 +34,20 @@ class Game:
                 x = start_x + i * 200
                 alien = Aliens(x, y)
                 self.aliens.add(alien)
+        elif self.level in (5, 6):
+            # For level 5: 2 rows of five aliens; for level 6: 3 rows of five aliens.
+            columns = 5
+            rows = 2 if self.level == 5 else 3
+            spacing_x = 150  # horizontal spacing between aliens
+            spacing_y = 100  # vertical spacing between rows
+            start_x = (screen_width - (columns - 1) * spacing_x) // 2
+            start_y = 50
+            for row in range(rows):
+                for col in range(columns):
+                    x = start_x + col * spacing_x
+                    y = start_y + row * spacing_y
+                    alien = Aliens(x, y)
+                    self.aliens.add(alien)
         # ...existing code for other levels if any...
 
 
@@ -117,4 +131,4 @@ if __name__ == "__main__":
         screen.fill((0, 0, 0))  # Fill the screen with black
         game.run()
         pygame.display.flip()  # Update the display
-        clock.tick(60)  # Limit to 60 frames per second
+        clock.tick(60)  # Limit the frame rate to 60 FPS
