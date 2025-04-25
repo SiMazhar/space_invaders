@@ -24,8 +24,7 @@ class Game:
                     alien = Aliens(x, y)
                     self.aliens.add(alien)
         elif self.level in (2, 3):
-            # For levels 2 and 3: number of aliens increases by 2 from previous level.
-            # Level 2: 1+2*(2-1)=3 aliens; Level 3: 1+2*(3-1)=5 aliens.
+            # For levels 2 and 3: formation with 3 aliens at level 2 and 5 aliens at level 3.
             num_aliens = 1 + 2 * (self.level - 1)
             total_spacing = (num_aliens - 1) * 200  # spacing between aliens is 60 pixels
             start_x = (screen_width - total_spacing) // 2
@@ -46,6 +45,20 @@ class Game:
                 for col in range(columns):
                     x = start_x + col * spacing_x
                     y = start_y + row * spacing_y
+                    alien = Aliens(x, y)
+                    self.aliens.add(alien)
+        elif self.level == 7:
+            # For level 7: formation with 4 rows of five aliens.
+            columns = 5
+            rows = 4
+            spacing_x = 150  # horizontal spacing between aliens
+            spacing_y = 100  # vertical spacing between rows
+            start_x = (screen_width - (columns - 1) * spacing_x) // 2
+            start_y = 50
+            for r in range(rows):
+                for c in range(columns):
+                    x = start_x + c * spacing_x
+                    y = start_y + r * spacing_y
                     alien = Aliens(x, y)
                     self.aliens.add(alien)
         # ...existing code for other levels if any...
