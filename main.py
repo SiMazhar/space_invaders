@@ -7,8 +7,10 @@ class Game:
         self.player = pygame.sprite.GroupSingle(player_sprite)
 
     def run(self):
-        self.player.draw(screen)
         self.player.update()
+
+        self.player.sprite.lasers.draw(screen)  # Draw the laser
+        self.player.draw(screen)
 
 if __name__ == "__main__":
     pygame.init()
