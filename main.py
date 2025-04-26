@@ -1,7 +1,9 @@
 import pygame, sys, random
 from player import Player
 from aliens import Aliens
+from asteroids import Asteroid
 
+ASTEROID_SPAWN_EVENT = pygame.USEREVENT + 1
 
 class Game:
     def __init__(self):
@@ -11,6 +13,7 @@ class Game:
         self.aliens = pygame.sprite.Group()
         self.level = 1  # Initialize the level
         self.alien_setup()
+        self.asteroids = pygame.sprite.Group()
 
 
     def alien_setup(self):
@@ -67,6 +70,8 @@ class Game:
     def run(self):
         self.player.update()
         self.aliens.update()  # update aliens using their move function
+        self.asteroids.update()  # update asteroids using their move function
+
         
         # Check if any alien laser hits player; if so, display "You Lose!" and exit.
         for alien in self.aliens:
@@ -85,6 +90,7 @@ class Game:
             alien.lasers.draw(screen)
         self.player.sprite.lasers.draw(screen)  # Draw the player laser
         self.player.draw(screen)
+        self.asteroids.draw(screen)  # Draw the asteroids
         
 
 
@@ -134,12 +140,27 @@ if __name__ == "__main__":
     screen.blit(level_text, level_rect)
     pygame.display.flip()
     pygame.time.wait(2000)  # wait 2 seconds before starting the game
+
+    # schedule ASTEROID_SPAWN_EVENT every 200 ms
+    pygame.time.set_timer(ASTEROID_SPAWN_EVENT, 200)
+    # remember when we started spawning
+    spawn_start = pygame.time.get_ticks()
+    
     
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            elif event.type == ASTEROID_SPAWN_EVENT:
+                elapsed = pygame.time.get_ticks() - spawn_start
+                if elapsed <= 15_000:
+                    # still within 10 seconds → spawn one
+                    game.asteroids.add(Asteroid())
+                else:
+                    # >10 seconds → stop the timer
+                    pygame.time.set_timer(ASTEROID_SPAWN_EVENT, 0)
 
         screen.fill((0, 0, 0))  # Fill the screen with black
         game.run()
