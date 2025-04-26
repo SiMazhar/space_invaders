@@ -99,6 +99,17 @@ class Game:
         if self.boss:
             self.boss.update()
         
+        # Check if any alien reaches the bottom of the screen.
+        for alien in self.aliens:
+            if alien.rect.bottom >= screen_height:
+                self.lose()
+                return
+
+        # Check if the boss reaches the bottom of the screen.
+        if self.boss and self.boss.sprite.rect.bottom >= screen_height:
+            self.lose()
+            return
+
         # New collision check: if player collides with any asteroid, they lose.
         if pygame.sprite.spritecollide(self.player.sprite, self.asteroids, False):
             self.lose()
@@ -122,7 +133,7 @@ class Game:
             if pygame.sprite.spritecollide(self.player.sprite, alien.lasers, True):
                 self.lose()
                 return
-
+       
         pygame.sprite.groupcollide(self.player.sprite.lasers, self.aliens, True, True)
         
         # Boss collision handling: reduce boss health by hits.
@@ -183,16 +194,40 @@ class Game:
         sys.exit() 
 
     def lose(self):
-        # Clear screen to black and display "You Lose!" in red.
         screen.fill((0, 0, 0))
         font = pygame.font.SysFont(None, 74)
-        text = font.render("You Lose!", True, (255, 0, 0))
-        text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
-        screen.blit(text, text_rect)
+        lose_text = font.render("You Lose!", True, (255, 0, 0))
+        lose_rect = lose_text.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
+        screen.blit(lose_text, lose_rect)
         pygame.display.flip()
-        pygame.time.wait(3000)
-        pygame.quit()
-        sys.exit()
+        pygame.time.wait(1000)  # briefly pause before showing button
+        self.play_again(lose_rect)
+
+    def play_again(self, lose_rect):
+        # Draw a "Play Again" button centered below the "You Lose!" text.
+        margin = 20
+        button_rect = pygame.Rect(screen_width // 2 - 100, lose_rect.bottom + margin, 200, 50)
+        button_font = pygame.font.SysFont(None, 50)
+        button_text = button_font.render("Play Again", True, (255, 255, 255))
+        text_rect = button_text.get_rect(center=button_rect.center)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if button_rect.collidepoint(event.pos):
+                        self.level = 1
+                        self.alien_setup()
+                        self.asteroids.empty()
+                        self.boss.empty()
+                        self.player.sprite.lasers.empty()
+                        self.player.sprite.rect.midbottom = (screen_width // 2, screen_height)
+                        return
+            pygame.draw.rect(screen, (100, 100, 100), button_rect)
+            screen.blit(button_text, text_rect)
+            pygame.display.flip()
+            pygame.time.delay(30)
 
 if __name__ == "__main__":
     pygame.init()

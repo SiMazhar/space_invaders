@@ -27,7 +27,7 @@ class Boss(pygame.sprite.Sprite):
         self.direction = 1        # 1: moving right, -1: moving left
         self.lasers = pygame.sprite.Group()  # group for boss lasers
         self.last_shot = pygame.time.get_ticks()  # time of last shot
-        self.shoot_delay = 4000   # shoot delay in ms
+        self.shoot_delay = 700   # shoot delay in ms
         self.health = 30         # new: boss needs 30 hits to die
 
     def update(self):
