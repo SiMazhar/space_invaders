@@ -1,4 +1,5 @@
 import pygame, sys, random
+from time import sleep
 from player import Player
 from aliens import Aliens
 from asteroids import Asteroid
@@ -14,6 +15,13 @@ class Game:
         self.level = 1  # Initialize the level
         self.alien_setup()
         self.asteroids = pygame.sprite.Group()
+
+    def asteroid_setup(self):
+        a = random.randint(0, 5)
+        self.asteroids.add(Asteroid(a))
+        for i in range(50):
+            a = random.randint(0, 2)
+            self.asteroids.add(Asteroid(a))
 
 
     def alien_setup(self):
@@ -50,6 +58,12 @@ class Game:
                     y = start_y + row * spacing_y
                     alien = Aliens(x, y)
                     self.aliens.add(alien)
+        elif self.level == 4 or self.level == 8:
+            # For level 4: 2 rows of five aliens, but with a different arrangement.
+            columns = 0
+            rows = 0
+            self.asteroid_setup()
+            
         elif self.level == 7:
             # For level 7: formation with 4 rows of five aliens.
             columns = 5
@@ -64,14 +78,17 @@ class Game:
                     y = start_y + r * spacing_y
                     alien = Aliens(x, y)
                     self.aliens.add(alien)
-        # ...existing code for other levels if any...
 
 
     def run(self):
         self.player.update()
         self.aliens.update()  # update aliens using their move function
         self.asteroids.update()  # update asteroids using their move function
-
+        
+        # New collision check: if player collides with any asteroid, they lose.
+        if pygame.sprite.spritecollide(self.player.sprite, self.asteroids, False):
+            self.lose()
+            return
         
         # Check if any alien laser hits player; if so, display "You Lose!" and exit.
         for alien in self.aliens:
@@ -80,7 +97,7 @@ class Game:
                 return
         # Check collision: remove player laser and alien on hit
         pygame.sprite.groupcollide(self.player.sprite.lasers, self.aliens, True, True)
-        if not self.aliens:
+        if not self.aliens and not self.asteroids:
             self.level_transition(self.level + 1)  # transition to the next level
             return
         self.aliens.draw(screen)
@@ -153,14 +170,6 @@ if __name__ == "__main__":
                 pygame.quit()
                 sys.exit()
 
-            elif event.type == ASTEROID_SPAWN_EVENT:
-                elapsed = pygame.time.get_ticks() - spawn_start
-                if elapsed <= 15_000:
-                    # still within 10 seconds → spawn one
-                    game.asteroids.add(Asteroid())
-                else:
-                    # >10 seconds → stop the timer
-                    pygame.time.set_timer(ASTEROID_SPAWN_EVENT, 0)
 
         screen.fill((0, 0, 0))  # Fill the screen with black
         game.run()
