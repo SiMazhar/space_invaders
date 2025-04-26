@@ -23,9 +23,9 @@ class Game:
         self.asteroids.add(Asteroid(a))
         num_asteroids = 0
         if self.level == 4:
-            num_asteroids = 0
+            num_asteroids = 50
         elif self.level == 8:
-            num_asteroids = 0
+            num_asteroids = 80
         for i in range(num_asteroids):
             a = random.randint(0, 2)
             self.asteroids.add(Asteroid(a))
@@ -35,15 +35,15 @@ class Game:
         self.aliens.empty()  # clear existing aliens
         if self.level == 1:
             # Level 1: single alien formation
-            for row in range(0):
-                for column in range(0):
+            for row in range(1):
+                for column in range(1):
                     x = column * 100 + 50
                     y = row * 50 + 50
                     alien = Aliens(x, y)
                     self.aliens.add(alien)
         elif self.level in (2, 3):
             # For levels 2 and 3: formation with 3 aliens at level 2 and 5 aliens at level 3.
-            num_aliens = 0      #1 + 2 * (self.level - 1)
+            num_aliens = 1 + 2 * (self.level - 1)
             total_spacing = (num_aliens - 1) * 200  # spacing between aliens is 60 pixels
             start_x = (screen_width - total_spacing) // 2
             y = 50
@@ -53,8 +53,8 @@ class Game:
                 self.aliens.add(alien)
         elif self.level in (5, 6):
             # For level 5: 2 rows of five aliens; for level 6: 3 rows of five aliens.
-            columns = 0
-            rows = 0 if self.level == 5 else 0
+            columns = 5
+            rows = 2 if self.level == 5 else 3
             spacing_x = 150  # horizontal spacing between aliens
             spacing_y = 100  # vertical spacing between rows
             start_x = (screen_width - (columns - 1) * spacing_x) // 2
@@ -67,8 +67,8 @@ class Game:
                     self.aliens.add(alien)
         elif self.level == 7:
             # For level 7: formation with 4 rows of five aliens.
-            columns = 0
-            rows = 0
+            columns = 5
+            rows = 4
             spacing_x = 150  # horizontal spacing between aliens
             spacing_y = 100  # vertical spacing between rows
             start_x = (screen_width - (columns - 1) * spacing_x) // 2
@@ -123,7 +123,7 @@ class Game:
                 self.lose()
                 return
 
-        pygame.sprite.groupcollide(self.player.sprite.lasers, self.aliens, True)
+        pygame.sprite.groupcollide(self.player.sprite.lasers, self.aliens, True, True)
         
         # Boss collision handling: reduce boss health by hits.
         if self.boss:
@@ -155,29 +155,32 @@ class Game:
 
     def level_transition(self, level):
         screen.fill((0, 0, 0))
-        font = pygame.font.SysFont(None, 74)
         if level == 10:
-            win_text = font.render("You Win!", True, (0, 255, 0))
-            win_rect = win_text.get_rect(center=(screen_width // 2, screen_height // 2))
-            screen.blit(win_text, win_rect)
-            pygame.display.flip()
-            pygame.time.wait(2000)
-            pygame.quit()
-            sys.exit()
-        else:
-            level_text = font.render(f"Level: {level}", True, (255, 255, 255))
-            level_rect = level_text.get_rect(center=(screen_width // 2, screen_height // 2))
-            screen.blit(level_text, level_rect)
-            pygame.display.flip()
-            pygame.time.wait(2000)
-            # Clear the level text from screen completely.
-            screen.fill((0, 0, 0))
-            pygame.display.flip()
-            pygame.time.wait(100)  # extra wait to ensure the screen refreshes
-            self.level = level  # Update the current level
-            self.alien_setup()
+            self.win()
+        font = pygame.font.SysFont(None, 74)
+        level_text = font.render(f"Level: {level}", True, (255, 255, 255))
+        level_rect = level_text.get_rect(center=(screen_width // 2, screen_height // 2))
+        screen.blit(level_text, level_rect)
+        pygame.display.flip()
+        pygame.time.wait(2000)
+        # Clear the level text from screen completely.
+        screen.fill((0, 0, 0))
+        pygame.display.flip()
+        pygame.time.wait(100)  # extra wait to ensure the screen refreshes
+        self.level = level  # Update the current level
+        self.alien_setup()
 
-        
+    def win(self):
+        # Clear screen to black and display "You Lose!" in red.
+        screen.fill((0, 0, 0))
+        font = pygame.font.SysFont(None, 74)
+        text = font.render("You Win!", True, ('green'))
+        text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        pygame.time.wait(3000)
+        pygame.quit()
+        sys.exit() 
 
     def lose(self):
         # Clear screen to black and display "You Lose!" in red.
